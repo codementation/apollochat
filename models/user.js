@@ -1,6 +1,6 @@
 'use strict';
 
-const {Model} = require('sequelize');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -24,6 +24,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
+        validate: {
+          isEmail: {
+            args: true,
+            msg: 'must be a valid email address',
+          },
+        },
       },
       password: {
         type: DataTypes.STRING,
