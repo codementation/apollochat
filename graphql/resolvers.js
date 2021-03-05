@@ -2,18 +2,36 @@ const bcrypt = require('bcrypt')
 const { UserInputError, AuthenticationError } = require('apollo-server')
 const jwt = require('jsonwebtoken')
 const { JWT_SECRET } = require('../config/env.json')
+const { Op } = require('sequelize')
 
 const { User } = require('../models')
 
 module.exports = {
   Query: {
-    getUsers: async () => {
+    getUsers: async (_, __, context) => {
       try {
-        const users = await User.findAll()
+        if (context.req && context.req.headers.autorization) {
+          const token = context.req.headers.autorization.split('Bearer ')[1]
+          jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
+            if (err) {
+              throw new AuthenticationError('unauthenticated')
+            }
+            user = decodedToken
+          })
+        }
+        const users = await User.findAll(
+          {
+            where: {
+              username: {
+                [Op.ne]: user.username
+              }
+            }
+          })
 
         return users
       } catch (err) {
         console.log(err)
+        throw err
       }
     },
 
@@ -54,7 +72,13 @@ module.exports = {
 
         user.token = token
 
-        return user
+        return {
+          ...user.toJSON(),
+          // GraphQL returns Epoch time so
+          // convert to ISO String
+          createdAt: user.createdAt.toISOString(),
+          token,
+        }
       } catch (err) {
         console.log(err)
         throw err
