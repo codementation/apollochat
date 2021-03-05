@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Row, Col, Form, Button } from 'react-bootstrap'
 import { gql, useMutation } from '@apollo/client'
-//import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const REGISTER_USER = gql`
   mutation register(
@@ -30,16 +30,11 @@ export default function Register(props) {
     password: '',
     confirmPassword: '',
   })
-
   const [errors, setErrors] = useState({})
 
   const [registerUser, { loading }] = useMutation(REGISTER_USER, {
-    // lifecycle hooks of the mutation
     update: (_, __) => props.history.push('/login'),
-    onError: (err) => {
-      console.log(err.graphQLErrors[0].extensions.errors)
-      setErrors(err.graphQLErrors[0].extensions.errors)
-    },
+    onError: (err) => setErrors(err.graphQLErrors[0].extensions.errors),
   })
 
   const submitRegisterForm = (e) => {
@@ -94,7 +89,7 @@ export default function Register(props) {
           </Form.Group>
           <Form.Group>
             <Form.Label className={errors.confirmPassword && 'text-danger'}>
-              {errors.confirmPassword && 'Confirm confirmPassword'}
+              {errors.confirmPassword ?? 'Confirm password'}
             </Form.Label>
             <Form.Control
               type="password"
@@ -110,8 +105,12 @@ export default function Register(props) {
           </Form.Group>
           <div className="text-center">
             <Button variant="success" type="submit" disabled={loading}>
-              Register
+              {loading ? 'loading..' : 'Register'}
             </Button>
+            <br />
+            <small>
+              Already have an account? <Link to="/login">Login</Link>
+            </small>
           </div>
         </Form>
       </Col>

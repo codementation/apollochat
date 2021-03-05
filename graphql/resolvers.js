@@ -19,14 +19,13 @@ module.exports = {
             user = decodedToken
           })
         }
-        const users = await User.findAll(
-          {
-            where: {
-              username: {
-                [Op.ne]: user.username
-              }
-            }
-          })
+        const users = await User.findAll({
+          where: {
+            username: {
+              [Op.ne]: user.username,
+            },
+          },
+        })
 
         return users
       } catch (err) {
@@ -61,7 +60,7 @@ module.exports = {
 
         if (!correctPassword) {
           errors.password = 'password is incorrect'
-          throw new AuthenticationError('password is incorrect', {
+          throw new UserInputError('password is incorrect', {
             errors,
           })
         }
@@ -102,13 +101,6 @@ module.exports = {
 
         if (password !== confirmPassword)
           errors.confirmPassword = 'passwords must match'
-
-        // // Check if username / email exists
-        // const userByUsername = await User.findOne({ where: { username } })
-        // const userByEmail = await User.findOne({ where: { email } })
-
-        // if (userByUsername) errors.username = 'Username is taken'
-        // if (userByEmail) errors.email = 'Email is taken'
 
         if (Object.keys(errors).length > 0) {
           throw errors
