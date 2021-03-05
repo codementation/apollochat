@@ -1,14 +1,12 @@
-import { Container, Row, Col } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
+import Register from './components/register'
+
 import './App.scss'
 
 function App() {
     return (
         <Container>
-            <Row>
-                <Col>
-                    <h1>Register</h1>
-                    </Col>
-            </Row>
+            <Register />
         </Container>
     )
 }
